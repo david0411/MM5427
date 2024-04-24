@@ -1,29 +1,29 @@
 import re
-import nltk
 import pandas as pd
 from nltk.corpus import stopwords
+from nltk import word_tokenize
 
-
-word_count_list =[]
-nltk.download('stopwords')
+delimiter = ' '
 stop_words = set(stopwords.words('english'))
 
 x = pd.read_csv('AnnualReports1618.csv', header=0)
 x_2016 = x[x['filed_date'] < 20170000]
+processed_text = []
 
 for i in range(x_2016.shape[0]):
-# for i in range(20):
+# for i in range(10):
     content = str(x_2016['item7'][i]).lower()
     if content != 'nan':
-        words = set(re.split('[ (),.]', content))
-        discard_set = set()
-        words_swr = set(w for w in words if not w in stop_words)
-        for item in words_swr:
-            for num in re.findall(r"\d+", item):
-                discard_set.add(num)
-            if '$' in item or '%' in item or item == '':
-                discard_set.add(item)
-        for item in discard_set:
-            words_swr.discard(item)
-        word_count_list.append([x_2016['company_name'][i], len(words_swr)])
-pd.DataFrame(word_count_list, columns=['Company Name', 'Word Count']).to_excel('word_count.xlsx', index=False)
+        discard_set = {'$', '%', '(', ')', ''}
+        tokens = word_tokenize(content)
+        tokens = [w for w in tokens if not w in stop_words]
+        for item in tokens:
+            for word in re.findall(r"\d+(?:\.\d+)?", item):
+                discard_set.add(word)
+        tokens = [w for w in tokens if not w in discard_set]
+        processed_text.append(delimiter.join(tokens))
+    else:
+        processed_text.append('')
+x_2016['processed_text'] = processed_text
+x_2016.drop('item7', axis=1, inplace=True)
+x_2016.to_csv('AnnualReports1618_processed.csv', index=False)
