@@ -26,4 +26,4 @@ for i in range(x_2016.shape[0]):
         processed_text.append('')
 x_2016['processed_text'] = processed_text
 x_2016.drop('item7', axis=1, inplace=True)
-x_2016.to_csv('AnnualReports1618_processed.csv', index=False)
+x_2016.to_csv('AnnualReports16_processed.csv', index=False)
