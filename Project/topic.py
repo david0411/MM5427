@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 
 dataset = pd.read_csv('AnnualReports16_lemmatized.csv', header=0)
+dataset = dataset[dataset['lemmatized_text'] != "[]"]
 item7_words_lemmatized = dataset['lemmatized_text'].apply(ast.literal_eval).to_list()
 
 id2word = corpora.Dictionary(item7_words_lemmatized)
@@ -30,7 +31,7 @@ print('Perplexity: ', lda_model.log_perplexity(corpus))
 # print('Coherence Score: ', coherence_lda)
 
 lda_data = gensimvis.prepare(lda_model, corpus, id2word)
-pyLDAvis.save_html(lda_data, 'name_of_out_file.html')
+pyLDAvis.save_html(lda_data, 'LDA.html')
 
 topic = []
 
