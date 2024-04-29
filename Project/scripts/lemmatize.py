@@ -1,8 +1,8 @@
-import re
 import pandas as pd
 import spacy
 import gensim
 import time
+from nltk.corpus import stopwords
 
 
 def sent_to_words(sentences):
@@ -28,16 +28,10 @@ def lemmatization(texts, allowed_postags=None):
     return texts_out
 
 
-dataset = pd.read_csv('../document/AnnualReports16_processed.csv', header=0)
+stop_words = set(stopwords.words('english'))
+
+dataset = pd.read_csv('../document/AnnualReports16_processed9.csv', header=0)
 item7 = dataset['processed_text'].values.tolist()
-print("Preprocessing")
-tic = time.perf_counter()
-for i in range(len(item7)):
-    if isinstance(item7[i], str):
-        item7[i] = re.sub("[^A-Za-z0-9]+", " ", item7[i])
-        item7[i] = item7[i].lower()
-toc = time.perf_counter()
-print(f"Done preprocessing in {toc - tic:0.1f} seconds")
 
 item7_words = list(sent_to_words(item7))
 
@@ -49,7 +43,7 @@ trigram_mod = gensim.models.phrases.Phraser(trigram)
 
 print("Making Bigrams")
 tic = time.perf_counter()
-item7_words_bigrams = make_bigrams(item7_words)
+item7_words_bigrams = make_bigrams([w for w in item7_words if not w in stop_words])
 toc = time.perf_counter()
 print(f"Done bigrams in {toc - tic:0.1f} seconds")
 

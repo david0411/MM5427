@@ -6,13 +6,13 @@ from nltk import word_tokenize
 delimiter = ' '
 stop_words = set(stopwords.words('english'))
 
-x = pd.read_csv('../document/AnnualReports1618.csv', header=0)
-x_2016 = x[x['filed_date'] < 20170000]
+dataset = pd.read_csv('../document/AnnualReports1618.csv', header=0)
+dataset_2016 = dataset[dataset['filed_date'] < 20170000]
 processed_text = []
 
-for i in range(x_2016.shape[0]):
-# for i in range(10):
-    content = str(x_2016['item7'][i]).lower()
+for i in range(dataset_2016.shape[0]):
+    # for i in range(10):
+    content = str(dataset_2016['item7'][i]).lower()
     if content != 'nan':
         discard_set = {'$', '%', '(', ')', ''}
         tokens = word_tokenize(content)
@@ -24,6 +24,6 @@ for i in range(x_2016.shape[0]):
         processed_text.append(delimiter.join(tokens))
     else:
         processed_text.append('')
-x_2016['processed_text'] = processed_text
-x_2016.drop('item7', axis=1, inplace=True)
-x_2016.to_csv('../document/AnnualReports16_processed.csv', index=False)
+dataset_2016['processed_text'] = processed_text
+dataset_2016.drop('item7', axis=1, inplace=True)
+dataset_2016.to_csv('../document/AnnualReports16_processed.csv', index=False)
