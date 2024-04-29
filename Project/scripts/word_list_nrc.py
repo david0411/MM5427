@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
@@ -12,6 +13,8 @@ def sentiment_score(text, sen_list):
     temp_list = []
     for t in text:
         if isinstance(t, str):
+            t = re.sub("[^A-Za-z0-9]+", " ", t)
+            t = t.lower()
             temp = 0
             for w in sen_list:
                 temp += t.count(w)
@@ -24,13 +27,11 @@ def sentiment_score(text, sen_list):
     return temp_list
 
 
-dataset = pd.read_csv('AnnualReports16_topic.csv', header=0)
-lexicon = pd.read_csv('NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
+dataset = pd.read_csv('../document/AnnualReports16_processed.csv', header=0)
+lexicon = pd.read_csv('../word_list/NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
 
 category_list = lexicon['category'].unique().tolist()
-
 filtered_df = lexicon[lexicon['associated'] == 1]
-
 grouped_df = filtered_df.groupby('category')['term'].apply(list)
 
 dataset['Pos_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['positive'])
@@ -51,6 +52,8 @@ dataset['Sent_Dic_pos_surp'] = (
 dataset['Sent_Dic_neg_surp'] = (
             dataset['Pos_Dic'] + dataset['Anti_Dic'] + dataset['Joy_Dic'] + dataset['Tru_Dic'] - dataset['Surp_Dic']
             - dataset['Neg_Dic'] - dataset['Ang_Dic'] - dataset['Dis_Dic'] - dataset['Fear_Dic'] - dataset['Sad_Dic'])
+
+dataset.to_csv('../document/AnnualReports16_nrc.csv', index=False)
 
 features = dataset.loc[:, 'Pos_Dic':'Sent_Dic_neg_surp']
 X = features

@@ -9,7 +9,7 @@ import pyLDAvis.gensim_models as gensimvis  # don't skip this
 import matplotlib.pyplot as plt
 
 
-dataset = pd.read_csv('AnnualReports16_lemmatized.csv', header=0)
+dataset = pd.read_csv('../document/AnnualReports16_lemmatized.csv', header=0)
 dataset = dataset[dataset['lemmatized_text'] != "[]"]
 item7_words_lemmatized = dataset['lemmatized_text'].apply(ast.literal_eval).to_list()
 
@@ -40,4 +40,4 @@ for i, row_list in enumerate(lda_model[corpus]):
     topic.append(row[0][0])
 
 dataset['topic'] = topic
-dataset.to_csv('AnnualReports16_topic.csv', index=False)
+dataset.to_csv('../document/AnnualReports16_topic.csv', index=False)

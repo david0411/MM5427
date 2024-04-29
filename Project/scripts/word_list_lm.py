@@ -5,15 +5,14 @@ import numpy as np
 import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, mean_squared_log_error, median_absolute_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, median_absolute_error
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
 def sentiment_score(text, sen_list):
-    # 确保文本不为空或None
     if pd.isnull(text) or text == "":
         return 0
-    # 计算文本中情感词汇的总数
+    text = re.sub("[^A-Za-z0-9]+", " ", text)
     total_count = sum(text.lower().count(word) for word in sen_list if word in text.lower())
     # 归一化得分，使用文本长度作为分母
     return total_count / max(len(text), 1)
@@ -49,12 +48,13 @@ def stepwise_regression(X_LM, y, significance_level=0.1):
 
     return X_stepwise
 
-dataset = pd.read_csv('AnnualReports16_processed.csv', encoding='latin-1')
+
+dataset = pd.read_csv('../document/AnnualReports16_processed.csv', encoding='latin-1')
 dataset_cleaned = dataset.dropna()
 
 y = dataset_cleaned['market_abnormal_return']
 
-lexicon_LM = pd.read_csv('Loughran-McDonald_MasterDictionary_1993-2023.csv')
+lexicon_LM = pd.read_csv('../word_list/Loughran-McDonald_MasterDictionary_1993-2023.csv')
 lexicon_LM['Word'] = lexicon_LM['Word'].str.lower()
 
 Negative = set(lexicon_LM[lexicon_LM['Negative'] != 0]['Word'])
@@ -68,13 +68,18 @@ Complexity = set(lexicon_LM[lexicon_LM['Complexity'] != 0]['Word'])
 
 for sentiment, score_name in zip(
         [Negative, Positive, Uncertainty, Litigious, Strong_Modal, Weak_Modal, Constraining, Complexity],
-        ['Negative_score', 'Positive_score', 'Uncertainty_score', 'Litigious_score', 'Strong_Modal_score', 'Weak_Modal_score', 'Constraining_score', 'Complexity_score']
+        ['Negative_score', 'Positive_score', 'Uncertainty_score', 'Litigious_score', 'Strong_Modal_score',
+         'Weak_Modal_score', 'Constraining_score', 'Complexity_score']
 ):
-    dataset_cleaned.loc[:, score_name] = dataset_cleaned['processed_text'].apply(lambda x: sentiment_score(x, list(sentiment)))
+    dataset_cleaned.loc[:, score_name] = dataset_cleaned['processed_text'].apply(
+        lambda x: sentiment_score(x, list(sentiment)))
 
-print(dataset_cleaned.head())
+dataset_cleaned.to_csv('../document/AnnualReports16_lm.csv', index=False)
 
-X_LM = dataset_cleaned[['nasdq', 'market_value', 'btm', 'pre_alpha', 'pre_rmse', 'InstOwn_Perc', 'log_share','Negative_score', 'Positive_score', 'Uncertainty_score', 'Litigious_score', 'Strong_Modal_score', 'Weak_Modal_score','Constraining_score','Complexity_score']]
+X_LM = dataset_cleaned[
+    ['nasdq', 'market_value', 'btm', 'pre_alpha', 'pre_rmse', 'InstOwn_Perc', 'log_share', 'Negative_score',
+     'Positive_score', 'Uncertainty_score', 'Litigious_score', 'Strong_Modal_score', 'Weak_Modal_score',
+     'Constraining_score', 'Complexity_score']]
 
 x_LM_train, x_LM_test, y_LM_train, y_LM_test = train_test_split(X_LM, y, test_size=0.2, random_state=42)
 
@@ -85,7 +90,7 @@ y_LM_pred = model_LM.predict(x_LM_test)
 
 mse_LM = mean_squared_error(y_LM_test, y_LM_pred)
 mae_LM = mean_absolute_error(y_LM_test, y_LM_pred)
-r2_LM= r2_score(y_LM_test, y_LM_pred)
+r2_LM = r2_score(y_LM_test, y_LM_pred)
 medae_LM = median_absolute_error(y_LM_test, y_LM_pred)
 
 print(f"Model_count_vector reply count MSE: {mse_LM}")

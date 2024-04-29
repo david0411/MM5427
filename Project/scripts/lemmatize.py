@@ -28,7 +28,7 @@ def lemmatization(texts, allowed_postags=None):
     return texts_out
 
 
-dataset = pd.read_csv('AnnualReports16_processed.csv', header=0)
+dataset = pd.read_csv('../document/AnnualReports16_processed.csv', header=0)
 item7 = dataset['processed_text'].values.tolist()
 print("Preprocessing")
 tic = time.perf_counter()
@@ -61,4 +61,4 @@ item7_words_lemmatized = lemmatization(item7_words_bigrams, allowed_postags=['NO
 toc = time.perf_counter()
 print(f"Done lemmatization in {toc - tic:0.1f} seconds")
 dataset['lemmatized_text'] = item7_words_lemmatized
-dataset.to_csv('AnnualReports16_lemmatized.csv', index=False)
+dataset.to_csv('../document/AnnualReports16_lemmatized.csv', index=False)

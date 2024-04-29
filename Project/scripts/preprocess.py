@@ -6,7 +6,7 @@ from nltk import word_tokenize
 delimiter = ' '
 stop_words = set(stopwords.words('english'))
 
-x = pd.read_csv('AnnualReports1618.csv', header=0)
+x = pd.read_csv('../document/AnnualReports1618.csv', header=0)
 x_2016 = x[x['filed_date'] < 20170000]
 processed_text = []
 
@@ -26,4 +26,4 @@ for i in range(x_2016.shape[0]):
         processed_text.append('')
 x_2016['processed_text'] = processed_text
 x_2016.drop('item7', axis=1, inplace=True)
-x_2016.to_csv('AnnualReports16_processed.csv', index=False)
+x_2016.to_csv('../document/AnnualReports16_processed.csv', index=False)
