@@ -27,23 +27,9 @@ category_list = lexicon['category'].unique().tolist()
 filtered_df = lexicon[lexicon['associated'] == 1]
 grouped_df = filtered_df.groupby('category')['term'].apply(list)
 
-dataset['Pos_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['positive'])
-dataset['Neg_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['negative'])
-dataset['Ang_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['anger'])
-dataset['Anti_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['anticipation'])
-dataset['Dis_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['disgust'])
-dataset['Fear_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['fear'])
-dataset['Joy_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['joy'])
-dataset['Sad_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['sadness'])
-dataset['Surp_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['surprise'])
-dataset['Tru_Dic'] = sentiment_score(dataset['processed_text'], grouped_df.loc['trust'])
+dataset['Pos_Anti_Dic'] = sentiment_score(dataset['processed_text'],
+                                          set(grouped_df.loc['anticipation']).intersection(grouped_df.loc['positive']))
+dataset['Neg_Anti_Dic'] = sentiment_score(dataset['processed_text'],
+                                          set(grouped_df.loc['anticipation']).intersection(grouped_df.loc['negative']))
 
-dataset['Sent_Dic_pos_surp'] = (
-            dataset['Pos_Dic'] + dataset['Anti_Dic'] + dataset['Joy_Dic'] + dataset['Surp_Dic'] + dataset['Tru_Dic']
-            - dataset['Neg_Dic'] - dataset['Ang_Dic'] - dataset['Dis_Dic'] - dataset['Fear_Dic'] - dataset['Sad_Dic'])
-
-dataset['Sent_Dic_neg_surp'] = (
-            dataset['Pos_Dic'] + dataset['Anti_Dic'] + dataset['Joy_Dic'] + dataset['Tru_Dic'] - dataset['Surp_Dic']
-            - dataset['Neg_Dic'] - dataset['Ang_Dic'] - dataset['Dis_Dic'] - dataset['Fear_Dic'] - dataset['Sad_Dic'])
-
-dataset.to_csv('../document/AnnualReports16_nrc.csv', index=False)
+dataset.to_csv('../document/AnnualReports16_nrc_v2.csv', index=False)

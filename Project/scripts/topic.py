@@ -18,7 +18,7 @@ corpus = [id2word.doc2bow(text) for text in item7_words_lemmatized]
 
 print("Building Model")
 tic = time.perf_counter()
-lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=9, update_every=1,
+lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=5, update_every=1,
                                             chunksize=100, passes=10, alpha='auto', per_word_topics=True)
 toc = time.perf_counter()
 print(f"Done lda model in {toc - tic:0.1f} seconds")
@@ -31,7 +31,7 @@ print('Perplexity: ', lda_model.log_perplexity(corpus))
 # print('Coherence Score: ', coherence_lda)
 
 lda_data = gensimvis.prepare(lda_model, corpus, id2word)
-pyLDAvis.save_html(lda_data, 'LDA.html')
+pyLDAvis.save_html(lda_data, '../model/LDA5.html')
 
 topic = []
 
