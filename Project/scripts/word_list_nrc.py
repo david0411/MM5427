@@ -17,7 +17,7 @@ def sentiment_score(text, sen_list):
     return temp_list
 
 
-df = pd.read_csv('../document/Preprocessed_18.csv')
+df = pd.read_csv('../document/Preprocessed_17.csv')
 
 nrc = pd.read_csv('../word_list/NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
 category_list = nrc['category'].unique().tolist()
@@ -43,13 +43,15 @@ sen_df['Pos_Dic'] = sentiment_score(df['item7'], pos_list)
 sen_df['Neg_Dic'] = sentiment_score(df['item7'], neg_list)
 sen_df['Anti_Dic'] = sentiment_score(df['item7'], anti_list)
 
-sen_df['pos_anti_increment'] = (sen_df['Pos_Dic'] + sen_df['Anti_Dic']) / sen_df['Anti_Dic']
-sen_df['neg_anti_increment'] = (sen_df['Anti_Dic'] - sen_df['Neg_Dic']) / sen_df['Anti_Dic']
+A_P_list = list(set(anti_list) & set(pos_list))
+A_N_list = list(set(anti_list) & set(neg_list))
+Neutral_list = [x for x in anti_list if x not in A_P_list and x not in A_N_list]
+sen_df['pos_anti_score'] = sentiment_score(df['item7'], A_P_list)
+sen_df['neg_anti_score'] = sentiment_score(df['item7'], A_N_list)
+sen_df['neutral_anti_score'] = sentiment_score(df['item7'], Neutral_list)
+sen_df['final_score'] = sen_df['neutral_anti_score'] + sen_df['pos_anti_score'] - sen_df['neg_anti_score']
 
-sen_df['result'] = sen_df.apply(
-    lambda row: row['pos_anti_increment'] if row['Pos_Dic'] > row['Neg_Dic'] else row['neg_anti_increment'], axis=1)
-
-df2 = pd.DataFrame(sen_df['result']).copy()
+df2 = pd.DataFrame(sen_df['final_score']).copy()
 df2['unc_Dic'] = sentiment_score(df['item7'], unc_list)
 df2['stg_Dic'] = sentiment_score(df['item7'], stg_list)
 df2['weak_Dic'] = sentiment_score(df['item7'], weak_list)
@@ -60,5 +62,5 @@ df2['ctr_Dic'] = sentiment_score(df['item7'], ctr_list)
 df2['unc_risk'] = df2['unc_Dic'] + df2['weak_Dic'] - df2['stg_Dic']
 df2['lit_risk'] = df2['lit_Dic'] + df2['ctr_Dic']
 
-sen_df.to_csv('../document/18_result_score1.csv', index=False)
-df2.to_csv('../document/18_result_score2.csv', index=False)
+sen_df.to_csv('../document/17_result_score1.csv', index=False)
+df2.to_csv('../document/17_result_score2.csv', index=False)
