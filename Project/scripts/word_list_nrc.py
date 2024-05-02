@@ -1,4 +1,3 @@
-import re
 import pandas as pd
 
 
@@ -6,8 +5,6 @@ def sentiment_score(text, sen_list):
     temp_list = []
     for t in text:
         if isinstance(t, str):
-            t = re.sub("[^A-Za-z]+", "", t)
-            t = t.lower()
             temp = 0
             for w in sen_list:
                 temp += t.count(w)
@@ -20,16 +17,48 @@ def sentiment_score(text, sen_list):
     return temp_list
 
 
-dataset = pd.read_csv('../document/AnnualReports16_processed.csv', header=0)
-lexicon = pd.read_csv('../word_list/NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
+df = pd.read_csv('../document/Preprocessed_18.csv')
 
-category_list = lexicon['category'].unique().tolist()
-filtered_df = lexicon[lexicon['associated'] == 1]
+nrc = pd.read_csv('../word_list/NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
+category_list = nrc['category'].unique().tolist()
+filtered_df = nrc[nrc['associated'] == 1]
 grouped_df = filtered_df.groupby('category')['term'].apply(list)
 
-dataset['Pos_Anti_Dic'] = sentiment_score(dataset['processed_text'],
-                                          set(grouped_df.loc['anticipation']).intersection(grouped_df.loc['positive']))
-dataset['Neg_Anti_Dic'] = sentiment_score(dataset['processed_text'],
-                                          set(grouped_df.loc['anticipation']).intersection(grouped_df.loc['negative']))
+anti_list = grouped_df.loc['anticipation']
 
-dataset.to_csv('../document/AnnualReports16_nrc_v2.csv', index=False)
+mcd = pd.read_csv('../word_list/Loughran-McDonald_MasterDictionary_1993-2023.csv')
+mcd['Word'] = mcd['Word'].str.lower()
+
+neg_list = set(mcd[mcd['Negative'] != 0]['Word'])
+pos_list = set(mcd[mcd['Positive'] != 0]['Word'])
+unc_list = set(mcd[mcd['Uncertainty'] != 0]['Word'])
+lit_list = set(mcd[mcd['Litigious'] != 0]['Word'])
+stg_list = set(mcd[mcd['Strong_Modal'] != 0]['Word'])
+weak_list = set(mcd[mcd['Weak_Modal'] != 0]['Word'])
+ctr_list = set(mcd[mcd['Constraining'] != 0]['Word'])
+Comp_list = set(mcd[mcd['Complexity'] != 0]['Word'])
+
+sen_df = pd.DataFrame(df['item7']).copy()
+sen_df['Pos_Dic'] = sentiment_score(df['item7'], pos_list)
+sen_df['Neg_Dic'] = sentiment_score(df['item7'], neg_list)
+sen_df['Anti_Dic'] = sentiment_score(df['item7'], anti_list)
+
+sen_df['pos_anti_increment'] = (sen_df['Pos_Dic'] + sen_df['Anti_Dic']) / sen_df['Anti_Dic']
+sen_df['neg_anti_increment'] = (sen_df['Anti_Dic'] - sen_df['Neg_Dic']) / sen_df['Anti_Dic']
+
+sen_df['result'] = sen_df.apply(
+    lambda row: row['pos_anti_increment'] if row['Pos_Dic'] > row['Neg_Dic'] else row['neg_anti_increment'], axis=1)
+
+df2 = pd.DataFrame(sen_df['result']).copy()
+df2['unc_Dic'] = sentiment_score(df['item7'], unc_list)
+df2['stg_Dic'] = sentiment_score(df['item7'], stg_list)
+df2['weak_Dic'] = sentiment_score(df['item7'], weak_list)
+
+df2['lit_Dic'] = sentiment_score(df['item7'], lit_list)
+df2['ctr_Dic'] = sentiment_score(df['item7'], ctr_list)
+
+df2['unc_risk'] = df2['unc_Dic'] + df2['weak_Dic'] - df2['stg_Dic']
+df2['lit_risk'] = df2['lit_Dic'] + df2['ctr_Dic']
+
+sen_df.to_csv('../document/18_result_score1.csv', index=False)
+df2.to_csv('../document/18_result_score2.csv', index=False)

@@ -6,7 +6,7 @@ from nltk import word_tokenize
 delimiter = ' '
 stop_words = set(stopwords.words('english'))
 
-dataset = pd.read_csv('../document/AnnualReports1618.csv', header=0)
+dataset = pd.read_csv('../../document/AnnualReports1618.csv', header=0)
 dataset_2016 = dataset[dataset['filed_date'] < 20170000]
 processed_text = []
 

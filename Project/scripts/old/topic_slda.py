@@ -2,7 +2,7 @@ import pandas as pd
 import ast
 import tomotopy as tp
 
-dataset = pd.read_csv('../document/AnnualReports16_lemmatized.csv', header=0)
+dataset = pd.read_csv('../../document/old/AnnualReports16_lemmatized.csv', header=0)
 dataset = dataset[dataset['lemmatized_text'] != "[]"]
 
 slda_model = tp.SLDAModel(k=5, eta=0.01, min_cf=5, rm_top=0)  # Top Word: 1. increase 2. expense

@@ -10,7 +10,7 @@ def sentiment_score(text, sen_list):
     return total_count / max(len(text), 1)
 
 
-dataset = pd.read_csv('../document/AnnualReports16_processed.csv', encoding='latin-1')
+dataset = pd.read_csv('../document/old/AnnualReports16_processed.csv', encoding='latin-1')
 lexicon_LM = pd.read_csv('../word_list/Loughran-McDonald_MasterDictionary_1993-2023.csv')
 dataset_cleaned = dataset.dropna()
 lexicon_LM['Word'] = lexicon_LM['Word'].str.lower()

@@ -7,7 +7,7 @@ word_list = ['retire', 'resign', 'leave', 'transition', 'reinvent', 'reskill', '
              'redeploy', 'relocate', 'restart', 'redirection', 'redirection', 'transformation', 'new beginning',
              'second act', 'encore career', 'portfolio career', 'side hustle', 'gig work', 'freelance', 'consult',
              'downshift', 'recharge', 'sabbatical', 'self-employment', 'entrepreneurship']
-dataset = pd.read_csv('../document/AnnualReports16_processed.csv', header=0)
+dataset = pd.read_csv('../../document/old/AnnualReports16_processed.csv', header=0)
 dataset = dataset.dropna(axis=0)
 for line in dataset['processed_text']:
     words = nltk.word_tokenize(line)

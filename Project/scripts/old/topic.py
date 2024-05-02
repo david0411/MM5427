@@ -9,7 +9,7 @@ import pyLDAvis.gensim_models as gensimvis  # don't skip this
 import matplotlib.pyplot as plt
 
 
-dataset = pd.read_csv('../document/AnnualReports16_lemmatized.csv', header=0)
+dataset = pd.read_csv('../../document/old/AnnualReports16_lemmatized.csv', header=0)
 dataset = dataset[dataset['lemmatized_text'] != "[]"]
 item7_words_lemmatized = dataset['lemmatized_text'].apply(ast.literal_eval).to_list()
 
