@@ -17,7 +17,7 @@ def sentiment_score(text, sen_list):
     return temp_list
 
 
-df = pd.read_csv('../document/Preprocessed_17.csv')
+df = pd.read_csv('../document/Preprocessed_18.csv')
 
 nrc = pd.read_csv('../word_list/NRC-Emotion-Lexicon.txt', sep='\t', names=['term', 'category', 'associated'])
 category_list = nrc['category'].unique().tolist()
@@ -62,5 +62,5 @@ df2['ctr_Dic'] = sentiment_score(df['item7'], ctr_list)
 df2['unc_risk'] = df2['unc_Dic'] + df2['weak_Dic'] - df2['stg_Dic']
 df2['lit_risk'] = df2['lit_Dic'] + df2['ctr_Dic']
 
-sen_df.to_csv('../document/17_result_score1.csv', index=False)
-df2.to_csv('../document/17_result_score2.csv', index=False)
+sen_df.to_csv('../document/18_result_score1.csv', index=False)
+df2.to_csv('../document/18_result_score2.csv', index=False)
